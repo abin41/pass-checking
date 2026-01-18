@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Password Security Tool</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 20px;
+      max-width: 700px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .section {
+      margin: 30px 0;
+      padding: 25px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+    
+    .section:hover {
+      border-color: #667eea;
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+    }
+    
+    h2 {
+      color: #444;
+      margin-top: 0;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    label {
+      display: block;
+      margin: 15px 0 5px;
+      font-weight: 600;
+      color: #555;
+    }
+    
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 12px 15px;
+      margin: 8px 0 20px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+    
+    input[type="text"]:focus, input[type="number"]:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .checkbox-group {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+    }
+    
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      margin: 10px 0;
+      padding: 8px;
+      background: white;
+      border-radius: 6px;
+    }
+    
+    .checkbox-item input[type="checkbox"] {
+      margin-right: 10px;
+      transform: scale(1.2);
+    }
+    
+    button {
+      width: 100%;
+      padding: 14px;
+      margin: 10px 0;
+      font-size: 16px;
+      font-weight: 600;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    .result {
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 8px;
+      background: #f8f9fa;
+      border-left: 4px solid #667eea;
+    }
+    
+    .strength-meter {
+      height: 12px;
+      background: #eee;
+      border-radius: 6px;
+      margin: 15px 0;
+      overflow: hidden;
+    }
+    
+    .strength-fill {
+      height: 100%;
+      transition: all 0.5s ease;
+    }
+    
+    .weak { 
+      background: linear-gradient(to right, #ff4444, #ff8888);
+      width: 33%;
+    }
+    .medium { 
+      background: linear-gradient(to right, #ffbb33, #ffdd88);
+      width: 66%;
+    }
+    .strong { 
+      background: linear-gradient(to right, #00C851, #5eff8f);
+      width: 100%;
+    }
+    
+    .criteria-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+      margin: 15px 0;
+    }
+    
+    .criteria-item {
+      display: flex;
+      align-items: center;
+      padding: 8px;
+      background: white;
+      border-radius: 6px;
+      border: 1px solid #e0e0e0;
+    }
+    
+    .criteria-icon {
+      margin-right: 10px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    
+    .pass { color: #00C851; }
+    .fail { color: #ff4444; }
+    
+    .password-display {
+      font-family: 'Courier New', monospace;
+      font-size: 20px;
+      background: #333;
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      text-align: center;
+      letter-spacing: 2px;
+      user-select: all;
+    }
+    
+    .copy-btn {
+      background: #444 !important;
+      width: auto !important;
+      padding: 10px 20px !important;
+      font-size: 14px !important;
+      display: inline-block;
+      margin-top: 10px;
+    }
+    
+    .suggestions {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 6px;
+    }
+    
+    .suggestions ul {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+    
+    .suggestions li {
+      margin: 5px 0;
+    }
+    
+    .loading {
+      text-align: center;
+      color: #667eea;
+      font-style: italic;
+    }
+    
+    .error {
+      background: #ffebee;
+      border-left: 4px solid #ff4444;
+      color: #d32f2f;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 6px;
+    }
+    
+    .info-box {
+      background: #e3f2fd;
+      border-left: 4px solid #2196F3;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 6px;
+    }
+    
+    /* Footer Styles */
+    .footer {
+      margin-top: 40px;
+      padding: 25px;
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      border-top: 3px solid #4CAF50;
+    }
+    
+    .security-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 25px;
+      background: #e8f5e9;
+      border-radius: 50px;
+      margin-bottom: 20px;
+      border: 2px solid #4CAF50;
+    }
+    
+    .badge-icon {
+      font-size: 24px;
+    }
+    
+    .badge-text {
+      font-weight: bold;
+      color: #2E7D32;
+      font-size: 16px;
+    }
+    
+    .badge-subtext {
+      font-size: 13px;
+      color: #555;
+    }
+    
+    .security-features {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin: 25px 0;
+      flex-wrap: wrap;
+    }
+    
+    .feature {
+      text-align: center;
+      min-width: 120px;
+    }
+    
+    .feature-icon {
+      font-size: 28px;
+      margin-bottom: 5px;
+    }
+    
+    .feature-title {
+      font-weight: bold;
+      margin-bottom: 3px;
+    }
+    
+    .feature-desc {
+      font-size: 12px;
+      color: #777;
+    }
+    
+    .footer-bottom {
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px solid #ddd;
+      color: #777;
+      font-size: 13px;
+    }
+    
+    .footer-links {
+      margin: 10px 0;
+    }
+    
+    .footer-links a {
+      color: #667eea;
+      text-decoration: none;
+      margin: 0 8px;
+      transition: color 0.3s;
+    }
+    
+    .footer-links a:hover {
+      color: #764ba2;
+      text-decoration: underline;
+    }
+    
+    .creator-credit {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 8px 16px;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      border-radius: 50px;
+      font-weight: bold;
+      color: #444;
+    }
+    
+    .creator-name {
+      color: #667eea;
+      font-weight: bold;
+    }
+    
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+      .container {
+        padding: 15px;
+      }
+      .section {
+        padding: 15px;
+      }
+      .security-features {
+        gap: 15px;
+      }
+      .feature {
+        min-width: 100px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <h1>🔐 Password Security Tool</h1>
+    
+    <!-- Info Box -->
+    <div class="info-box">
+      <strong>⚠️ Important:</strong> All password processing happens locally in your browser. 
+      No data is ever sent to any server. Your privacy is guaranteed.
+    </div>
+    
+    <!-- Section 1: Check Password Strength -->
+    <div class="section">
+      <h2>🔍 Check Password Strength</h2>
+      
+      <label for="passwordInput">Enter your password:</label>
+      <input type="text" id="passwordInput" placeholder="Type your password here..." />
+      
+      <button onclick="checkStrength()">Analyze Password Strength</button>
+      
+      <div id="strengthResult">
+        <!-- Results will appear here -->
+      </div>
+    </div>
+    
+    <!-- Section 2: Generate Password -->
+    <div class="section">
+      <h2>⚡ Generate Secure Password</h2>
+      
+      <label for="lengthInput">Password Length (8-32 characters):</label>
+      <input type="number" id="lengthInput" min="8" max="32" value="12" />
+      
+      <div class="checkbox-group">
+        <strong>Include character types:</strong>
+        <div class="checkbox-item">
+          <input type="checkbox" id="uppercase" checked>
+          <label for="uppercase">Uppercase Letters (A-Z)</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="lowercase" checked>
+          <label for="lowercase">Lowercase Letters (a-z)</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="numbers" checked>
+          <label for="numbers">Numbers (0-9)</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="special" checked>
+          <label for="special">Special Characters (!@#$%^&*)</label>
+        </div>
+      </div>
+      
+      <button onclick="generatePassword()">Generate Secure Password</button>
+      
+      <div id="generatedPassword">
+        <!-- Generated password will appear here -->
+      </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="footer">
+      <!-- Security Badge -->
+      <div class="security-badge">
+        <span class="badge-icon">🔒</span>
+        <div>
+          <div class="badge-text">All Processing is Local</div>
+          <div class="badge-subtext">Your passwords never leave your browser</div>
+        </div>
+      </div>
+      
+      <!-- Security Features -->
+      <div class="security-features">
+        <div class="feature">
+          <div class="feature-icon">🚫</div>
+          <div class="feature-title">No Data Sent</div>
+          <div class="feature-desc">Nothing transmitted</div>
+        </div>
+        
+        <div class="feature">
+          <div class="feature-icon">📱</div>
+          <div class="feature-title">Works Offline</div>
+          <div class="feature-desc">No internet needed</div>
+        </div>
+        
+        <div class="feature">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-title">Instant Results</div>
+          <div class="feature-desc">No server delay</div>
+        </div>
+        
+        <div class="feature">
+          <div class="feature-icon">🔓</div>
+          <div class="feature-title">Open Source</div>
+          <div class="feature-desc">Code is transparent</div>
+        </div>
+      </div>
+      
+      <!-- Footer Bottom -->
+      <div class="footer-bottom">
+        <p>This tool runs entirely in your browser. No server processing required.</p>
+        
+        <div class="footer-links">
+          <a href="#" onclick="showPrivacyInfo()">Privacy Info</a>
+          • 
+          <a href="#" onclick="viewSourceCode()">View Source Code</a>
+          • 
+          <a href="#" onclick="showAbout()">About This Tool</a>
+        </div>
+        
+        <!-- Creator Credit -->
+        <div class="creator-credit">
+          <span>✨ Crafted with care by</span>
+          <span class="creator-name">Abin</span>
+        </div>
+        
+        <p style="margin-top: 10px; font-size: 12px; color: #999;">
+          Password Security Tool v1.0 • All rights reserved © 2024
+        </p>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Password strength checker (runs entirely in browser)
+    function checkStrength() {
+      const password = document.getElementById('passwordInput').value;
+      
+      if (!password) {
+        showError('strengthResult', 'Please enter a password to analyze');
+        return;
+      }
+      
+      showLoading('strengthResult', 'Analyzing password strength...');
+      
+      // Simulate processing delay
+      setTimeout(() => {
+        // Check criteria
+        const criteria = {
+          length: password.length >= 8,
+          lowercase: /[a-z]/.test(password),
+          uppercase: /[A-Z]/.test(password),
+          digit: /[0-9]/.test(password),
+          special: /[@#$%^&*()_+=!]/.test(password)
+        };
+        
+        let strengthScore = 0;
+        for (const key in criteria) {
+          if (criteria[key]) strengthScore++;
+        }
+        
+        // Determine strength level
+        let strengthLevel = '';
+        if (strengthScore === 5) {
+          strengthLevel = 'Strong';
+        } else if (strengthScore >= 3) {
+          strengthLevel = 'Medium';
+        } else {
+          strengthLevel = 'Weak';
+        }
+        
+        // Calculate crack time
+        const crackTime = estimateCrackTime(password);
+        
+        // Get suggestions
+        const suggestions = getSuggestions(criteria);
+        
+        // Build result display
+        displayStrengthResults({
+          strengthScore,
+          strengthLevel,
+          criteria,
+          crackTime,
+          suggestions,
+          length: password.length
+        });
+      }, 300);
+    }
+    
+    // Password generator (runs entirely in browser)
+    function generatePassword() {
+      const length = parseInt(document.getElementById('lengthInput').value);
+      const includeUppercase = document.getElementById('uppercase').checked;
+      const includeLowercase = document.getElementById('lowercase').checked;
+      const includeNumbers = document.getElementById('numbers').checked;
+      const includeSpecial = document.getElementById('special').checked;
+      
+      if (isNaN(length) || length < 8 || length > 32) {
+        showError('generatedPassword', 'Please enter a valid length between 8 and 32');
+        return;
+      }
+      
+      if (!includeUppercase && !includeLowercase && !includeNumbers && !includeSpecial) {
+        showError('generatedPassword', 'Please select at least one character type');
+        return;
+      }
+      
+      showLoading('generatedPassword', 'Generating secure password...');
+      
+      // Simulate processing delay
+      setTimeout(() => {
+        // Character sets
+        const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+        const numbers = '0123456789';
+        const special = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+        
+        // Build character pool based on selections
+        let charPool = '';
+        if (includeUppercase) charPool += uppercase;
+        if (includeLowercase) charPool += lowercase;
+        if (includeNumbers) charPool += numbers;
+        if (includeSpecial) charPool += special;
+        
+        // Generate password ensuring at least one of each selected type
+        let password = '';
+        
+        // Add one character from each selected type
+        if (includeUppercase) {
+          password += uppercase[Math.floor(Math.random() * uppercase.length)];
+        }
+        if (includeLowercase) {
+          password += lowercase[Math.floor(Math.random() * lowercase.length)];
+        }
+        if (includeNumbers) {
+          password += numbers[Math.floor(Math.random() * numbers.length)];
+        }
+        if (includeSpecial) {
+          password += special[Math.floor(Math.random() * special.length)];
+        }
+        
+        // Fill remaining length with random characters from the pool
+        while (password.length < length) {
+          password += charPool[Math.floor(Math.random() * charPool.length)];
+        }
+        
+        // Shuffle the password
+        password = password.split('').sort(() => Math.random() - 0.5).join('');
+        
+        // Display the password
+        displayGeneratedPassword(password, length);
+      }, 300);
+    }
+    
+    // Display strength results
+    function displayStrengthResults(data) {
+      let html = `
+        <h3>Password Analysis Results</h3>
+        
+        <div class="strength-meter">
+          <div class="strength-fill ${data.strengthLevel.toLowerCase()}"></div>
+        </div>
+        
+        <p><strong>Strength Level:</strong> 
+          <span style="color: ${
+            data.strengthLevel === 'Strong' ? '#00C851' : 
+            data.strengthLevel === 'Medium' ? '#ffbb33' : '#ff4444'
+          }">
+            ${data.strengthLevel} (${data.strengthScore}/5 points)
+          </span>
+        </p>
+        
+        <p><strong>Password Length:</strong> ${data.length} characters</p>
+        
+        <p><strong>Estimated Time to Crack:</strong><br>
+        <span style="color: #666; font-size: 14px;">${data.crackTime}</span></p>
+        
+        <h4>Password Criteria Check:</h4>
+        <div class="criteria-grid">
+      `;
+      
+      // Add criteria checks
+      const criteriaNames = {
+        length: 'At least 8 characters',
+        lowercase: 'Lowercase letters',
+        uppercase: 'Uppercase letters',
+        digit: 'Numbers',
+        special: 'Special characters'
+      };
+      
+      for (const [key, passed] of Object.entries(data.criteria)) {
+        html += `
+          <div class="criteria-item">
+            <span class="criteria-icon ${passed ? 'pass' : 'fail'}">
+              ${passed ? '✓' : '✗'}
+            </span>
+            <span>${criteriaNames[key]}</span>
+          </div>
+        `;
+      }
+      
+      html += `</div>`;
+      
+      // Add suggestions if any
+      if (data.suggestions && data.suggestions.length > 0) {
+        html += `
+          <div class="suggestions">
+            <h4>🔧 Suggestions for Improvement:</h4>
+            <ul>
+              ${data.suggestions.map(suggestion => `<li>${suggestion}</li>`).join('')}
+            </ul>
+          </div>
+        `;
+      }
+      
+      // Add security note
+      html += `
+        <div style="margin-top: 15px; padding: 10px; background: #e8f5e9; border-radius: 6px; font-size: 14px;">
+          <strong>🔒 Privacy Note:</strong> This analysis was performed locally in your browser. 
+          Your password was never sent over the internet.
+        </div>
+      `;
+      
+      document.getElementById('strengthResult').innerHTML = html;
+    }
+    
+    // Display generated password
+    function displayGeneratedPassword(password, length) {
+      // Check strength of generated password
+      const criteria = {
+        length: password.length >= 8,
+        lowercase: /[a-z]/.test(password),
+        uppercase: /[A-Z]/.test(password),
+        digit: /[0-9]/.test(password),
+        special: /[@#$%^&*()_+=!]/.test(password)
+      };
+      
+      let strengthScore = 0;
+      for (const key in criteria) {
+        if (criteria[key]) strengthScore++;
+      }
+      
+      let strengthLevel = strengthScore >= 4 ? 'strong' : strengthScore >= 3 ? 'medium' : 'weak';
+      
+      let html = `
+        <h3>✅ Secure Password Generated</h3>
+        
+        <div class="password-display" id="passwordText">
+          ${password}
+        </div>
+        
+        <button class="copy-btn" onclick="copyToClipboard('${password}')">
+          📋 Copy to Clipboard
+        </button>
+        
+        <div class="strength-meter">
+          <div class="strength-fill ${strengthLevel}"></div>
+        </div>
+        
+        <p><strong>Password Strength:</strong> ${strengthScore}/5</p>
+        <p><strong>Length:</strong> ${length} characters</p>
+        
+        <div class="info-box">
+          <strong>💡 Security Tip:</strong> Save this password in a secure password manager! 
+          Never store passwords in plain text files or email.
+        </div>
+      `;
+      
+      document.getElementById('generatedPassword').innerHTML = html;
+    }
+    
+    // Helper functions
+    function estimateCrackTime(password) {
+      const charsetSize = 94; // Printable ASCII characters
+      const length = password.length;
+      const possibleCombinations = Math.pow(charsetSize, length);
+      
+      // Different attack speeds
+      const attacks = [
+        { speed: 1000, label: 'Basic attack' },
+        { speed: 1000000, label: 'Fast attack' },
+        { speed: 1000000000, label: 'Supercomputer' }
+      ];
+      
+      let result = '<div style="font-size: 14px;">';
+      attacks.forEach(attack => {
+        const seconds = possibleCombinations / attack.speed;
+        let time;
+        
+        if (seconds < 1) time = 'Instantly';
+        else if (seconds < 60) time = `${seconds.toFixed(1)} seconds`;
+        else if (seconds < 3600) time = `${(seconds / 60).toFixed(1)} minutes`;
+        else if (seconds < 86400) time = `${(seconds / 3600).toFixed(1)} hours`;
+        else if (seconds < 31536000) time = `${(seconds / 86400).toFixed(1)} days`;
+        else time = `${(seconds / 31536000).toFixed(1)} years`;
+        
+        result += `${attack.label}: <strong>${time}</strong><br>`;
+      });
+      result += '</div>';
+      
+      return result;
+    }
+    
+    function getSuggestions(criteria) {
+      const suggestions = [];
+      if (!criteria.length) suggestions.push('Make password at least 8 characters long');
+      if (!criteria.lowercase) suggestions.push('Add lowercase letters (a-z)');
+      if (!criteria.uppercase) suggestions.push('Add uppercase letters (A-Z)');
+      if (!criteria.digit) suggestions.push('Add numbers (0-9)');
+      if (!criteria.special) suggestions.push('Add special characters (@#$%^&*()_+=!)');
+      return suggestions;
+    }
+    
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        showNotification('✅ Password copied to clipboard!');
+      }).catch(err => {
+        // Fallback method
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showNotification('✅ Password copied to clipboard!');
+      });
+    }
+    
+    function showLoading(elementId, message) {
+      document.getElementById(elementId).innerHTML = `
+        <div class="loading">⏳ ${message}</div>
+      `;
+    }
+    
+    function showError(elementId, message) {
+      document.getElementById(elementId).innerHTML = `
+        <div class="error">❌ ${message}</div>
+      `;
+    }
+    
+    function showNotification(message) {
+      // Remove existing notification
+      const existing = document.querySelector('.notification');
+      if (existing) existing.remove();
+      
+      // Create new notification
+      const notification = document.createElement('div');
+      notification.className = 'notification';
+      notification.innerHTML = message;
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #00C851;
+        color: white;
+        padding: 15px 25px;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        z-index: 1000;
+        animation: slideIn 0.3s ease;
+      `;
+      
+      document.body.appendChild(notification);
+      
+      // Remove after 3 seconds
+      setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    }
+    
+    // Add CSS animations for notification
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+    
+    // Footer functionality
+    function viewSourceCode() {
+      showNotification('🔍 View page source (Ctrl+U) to see the code!');
+      return false;
+    }
+    
+    function showPrivacyInfo() {
+      const modal = createModal(`
+        <h3 style="color: #2E7D32; margin-bottom: 15px;">🔒 Privacy & Security Information</h3>
+        
+        <div style="text-align: left; margin-bottom: 20px;">
+          <p><strong>This tool is 100% client-side and private:</strong></p>
+          <ul style="margin: 10px 0 10px 20px;">
+            <li>✅ All processing happens in your browser</li>
+            <li>✅ No passwords are sent to any server</li>
+            <li>✅ No data is stored or logged</li>
+            <li>✅ No cookies or tracking</li>
+            <li>✅ Works completely offline</li>
+          </ul>
+        </div>
+        
+        <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; margin: 15px 0;">
+          <strong>🔐 Your Privacy is Guaranteed</strong>
+          <p style="margin-top: 8px; font-size: 14px;">
+            Every keystroke and password check happens locally on your device. 
+            This page is a static HTML file with no backend server.
+          </p>
+        </div>
+        
+        <div style="margin-top: 20px; padding: 15px; background: #f5f7fa; border-radius: 8px;">
+          <strong>📝 About the Creator</strong>
+          <p style="margin-top: 10px; font-size: 14px;">
+            This tool was created by <strong>Abin</strong> to help people improve their password security 
+            without compromising their privacy. It's completely free and open for anyone to use.
+          </p>
+        </div>
+      `);
+      document.body.appendChild(modal);
+      return false;
+    }
+    
+    function showAbout() {
+      const modal = createModal(`
+        <h3 style="color: #667eea; margin-bottom: 15px;">✨ About This Tool</h3>
+        
+        <div style="text-align: left; margin-bottom: 20px;">
+          <p><strong>Password Security Tool v1.0</strong></p>
+          <p>A client-side application for checking password strength and generating secure passwords.</p>
+        </div>
+        
+        <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 15px 0;">
+          <strong>🎯 Features:</strong>
+          <ul style="margin: 10px 0 10px 20px;">
+            <li>Password strength analysis with detailed criteria</li>
+            <li>Secure password generation with customizable options</li>
+            <li>Estimated crack time calculation</li>
+            <li>100% client-side processing</li>
+            <li>No data transmission or storage</li>
+            <li>Works offline after initial load</li>
+          </ul>
+        </div>
+        
+        <div style="margin-top: 20px; padding: 15px; background: #f5f7fa; border-radius: 8px;">
+          <strong>👨‍💻 Created by: <span style="color: #667eea;">Abin</span></strong>
+          <p style="margin-top: 10px; font-size: 14px;">
+            This tool was built to promote better password hygiene while maintaining 
+            absolute user privacy. All processing happens locally in your browser.
+          </p>
+        </div>
+        
+        <div style="margin-top: 20px; font-size: 12px; color: #777;">
+          <p>© 2024 Password Security Tool. All rights reserved.</p>
+        </div>
+      `);
+      document.body.appendChild(modal);
+      return false;
+    }
+    
+    function createModal(content) {
+      const modal = document.createElement('div');
+      modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      `;
+      
+      modal.innerHTML = `
+        <div style="
+          background: white;
+          padding: 30px;
+          border-radius: 15px;
+          max-width: 500px;
+          max-height: 80vh;
+          overflow-y: auto;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+          animation: fadeIn 0.3s ease;
+        ">
+          ${content}
+          <div style="text-align: center; margin-top: 25px;">
+            <button onclick="this.parentElement.parentElement.parentElement.remove()" style="
+              padding: 10px 30px;
+              background: #667eea;
+              color: white;
+              border: none;
+              border-radius: 8px;
+              cursor: pointer;
+              font-weight: bold;
+            ">
+              Close
+            </button>
+          </div>
+        </div>
+      `;
+      
+      // Add click outside to close
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.remove();
+        }
+      });
+      
+      return modal;
+    }
+    
+    // Add modal animation
+    const modalStyle = document.createElement('style');
+    modalStyle.textContent = `
+      @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+      }
+    `;
+    document.head.appendChild(modalStyle);
+    
+    // Allow Enter key to check password
+    document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        checkStrength();
+      }
+    });
+    
+    // Initialize with a welcome message
+    window.onload = function() {
+      setTimeout(() => {
+        document.getElementById('strengthResult').innerHTML = `
+          <div style="text-align: center; padding: 20px; color: #666;">
+            <p style="font-size: 16px;">🔐 Welcome to the Password Security Tool!</p>
+            <p style="margin-top: 10px;">Enter a password to check its strength or generate a new secure password.</p>
+            <p style="margin-top: 10px; font-size: 14px; color: #4CAF50;">
+              <strong>Remember:</strong> All processing happens locally in your browser.
+            </p>
+          </div>
+        `;
+      }, 100);
+    };
+  </script>
+</body>
+</html>
